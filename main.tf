@@ -34,11 +34,67 @@ variable "labelPrefix" {
 variable "region" {
   description = "Region where resource is deployed to"
   type        = string
-  default     = "canadacentral"
+  default     = "Canada Central"
 }
 
 variable "admin_username" {
   description = "VM Admin username"
   type        = string
   default     = "joesanthosh"
+}
+
+resource "azurerm_resource_group" "cst8918lab5" {
+  name     = "${var.labelPrefix}-A05-RG"
+  location = var.region
+}
+
+resource "azurerm_public_ip" "publicipjoe" {
+  name                = "${var.labelPrefix}-A05-PublicIP"
+  location            = azurerm_resource_group.cst8918lab5.location
+  resource_group_name = azurerm_resource_group.cst8918lab5.name
+  allocation_method   = "Dynamic"
+}
+
+resource "azurerm_virtual_network" "vnetjoe" {
+  name                = "${var.labelPrefix}-A05-VirtualNetwork"
+  location            = azurerm_resource_group.cst8918lab5.location
+  address_space       = ["10.0.0.0/16"]
+  resource_group_name = azurerm_resource_group.cst8918lab5.name
+}
+
+resource "azurerm_subnet" "name" {
+  name                 = "${var.labelPrefix}-A05-Subnet"
+  resource_group_name  = azurerm_resource_group.cst8918lab5.name
+  virtual_network_name = azurerm_virtual_network.vnetjoe.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_network_security_group" "securitygrpjoe" {
+  name                = "${var.labelPrefix}-A05-SecurityGroup"
+  resource_group_name = azurerm_resource_group.cst8918lab5.name
+  location            = azurerm_resource_group.cst8918lab5.location
+
+  security_rule {
+    name                       = "SSH"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "22"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+  security_rule {
+    name                       = "HTTP"
+    priority                   = 101
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
 }
