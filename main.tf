@@ -126,3 +126,32 @@ data "cloudinit_config" "init" {
     content      = file("${path.module}/init.sh")
   }
 }
+
+resource "azurerm_linux_virtual_machine" "myvmjoe" {
+  name                            = "${var.labelPrefix}-A05-VM"
+  resource_group_name             = azurerm_resource_group.cst8918lab5.name
+  location                        = azurerm_resource_group.cst8918lab5.location
+  size                            = "Standard_B1s"
+  admin_username                  = var.admin_username
+  network_interface_ids           = [azurerm_network_interface.vmnic.id]
+  disable_password_authentication = true
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "0001-com-ubuntu-server-jammy"
+    sku       = "22_04-lts"
+    version   = "latest"
+  }
+
+  admin_ssh_key {
+    username   = var.admin_username
+    public_key = file("~/.ssh/id_rsa.pub")
+  }
+
+  custom_data = base64encode(data.cloudinit_config.init.rendered)
+}
