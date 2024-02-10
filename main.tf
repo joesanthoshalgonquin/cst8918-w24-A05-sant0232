@@ -116,3 +116,13 @@ resource "azurerm_network_interface_security_group_association" "nisgassociation
   network_interface_id      = azurerm_network_interface.vmnic.id
   network_security_group_id = azurerm_network_security_group.securitygrpjoe.id
 }
+
+data "cloudinit_config" "init" {
+  gzip          = false
+  base64_encode = true
+
+  part {
+    content_type = "text/x-shellscript"
+    content      = file("${path.module}/init.sh")
+  }
+}
