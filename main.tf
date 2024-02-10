@@ -24,3 +24,21 @@ provider "azurerm" {
 provider "cloudinit" {
   # Configuration options
 }
+
+variable "labelPrefix" {
+  description = "Resource label prefix"
+  type        = string
+  default     = "sant0232"
+}
+
+variable "region" {
+  description = "Region where resource is deployed to"
+  type        = string
+  default     = "canadacentral"
+}
+
+variable "admin_username" {
+  description = "VM Admin username"
+  type        = string
+  default     = "joesanthosh"
+}
