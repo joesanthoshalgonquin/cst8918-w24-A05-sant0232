@@ -155,3 +155,11 @@ resource "azurerm_linux_virtual_machine" "myvmjoe" {
 
   custom_data = base64encode(data.cloudinit_config.init.rendered)
 }
+
+output "resource_group_name" {
+  value = azurerm_resource_group.cst8918lab5.name
+}
+
+output "public_ip" {
+  value = azurerm_linux_virtual_machine.myvmjoe.public_ip_address
+}
