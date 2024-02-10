@@ -62,7 +62,7 @@ resource "azurerm_virtual_network" "vnetjoe" {
   resource_group_name = azurerm_resource_group.cst8918lab5.name
 }
 
-resource "azurerm_subnet" "name" {
+resource "azurerm_subnet" "subnetjoe" {
   name                 = "${var.labelPrefix}-A05-Subnet"
   resource_group_name  = azurerm_resource_group.cst8918lab5.name
   virtual_network_name = azurerm_virtual_network.vnetjoe.name
@@ -97,4 +97,22 @@ resource "azurerm_network_security_group" "securitygrpjoe" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+}
+
+resource "azurerm_network_interface" "vmnic" {
+  name                = "${var.labelPrefix}-A05-NIC"
+  location            = azurerm_resource_group.cst8918lab5.location
+  resource_group_name = azurerm_resource_group.cst8918lab5.name
+
+  ip_configuration {
+    name                          = "${var.labelPrefix}-A05-NICconfig"
+    subnet_id                     = azurerm_subnet.subnetjoe.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.publicipjoe.id
+  }
+}
+
+resource "azurerm_network_interface_security_group_association" "nisgassociation" {
+  network_interface_id      = azurerm_network_interface.vmnic.id
+  network_security_group_id = azurerm_network_security_group.securitygrpjoe.id
 }
